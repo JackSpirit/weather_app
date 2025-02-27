@@ -3,9 +3,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-void main async()
+void main() async
 {
-  await dotenv.load();
+  await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
 
@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget
   Widget build(BuildContext context)
   {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Weather App',
       theme: ThemeData(primarySwatch: Colors.indigo),
       home: HomeScreen(),
@@ -70,6 +71,9 @@ class WeatherState extends State<HomeScreen>
         {
           isLoading=false;
           errorMessage='Please enter a valid name for the city';
+          temperature=null;
+          humidity=null;
+          iconCode=null;
         });
       }
     }
@@ -77,6 +81,10 @@ class WeatherState extends State<HomeScreen>
       setState(() {
         isLoading = false;
         errorMessage = 'Error,Plz try again later';
+        temperature=null;
+        humidity=null;
+        iconCode=null;
+
       });
     }
   }
@@ -86,7 +94,12 @@ class WeatherState extends State<HomeScreen>
   {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weather App'),
+        title: Text('Weather App',
+            style:TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30.0,
+            ),
+        ),
       ) ,
       body: Padding(
         padding:const EdgeInsets.all(15.0),
@@ -96,11 +109,11 @@ class WeatherState extends State<HomeScreen>
             TextField(
               controller: cityController,
               decoration: InputDecoration(
-                labelText: 'Enter City',
+                labelText: ('Enter City'),
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height:20),
+            SizedBox(height:25),
 
             ElevatedButton(
               onPressed: ()
@@ -117,7 +130,10 @@ class WeatherState extends State<HomeScreen>
             if(errorMessage.isNotEmpty)
               Text(
                 errorMessage,
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(
+                    fontSize:20,
+                    color: Colors.red[800]),
+
               ),
 
             if(isLoading)
@@ -125,21 +141,24 @@ class WeatherState extends State<HomeScreen>
 
             if(!isLoading && temperature!=null)...[
               Text(
-                'Temperature: ${temperature?.toStringAsFixed(1)} degree Celsius',
-                style: TextStyle(fontSize:20),
-
+                'Temperature: ${temperature?.toStringAsFixed(1)}°C',
+                style: TextStyle(fontSize:25),
               ),
 
               if(iconCode!=null)
                 Image.network(
                   'https://openweathermap.org/img/wn/$iconCode@2x.png',
-                  width: 50,
-                  height: 50,
+                  width: 100,
+                  height: 100,
 
                 ),
+
+              if(humidity!=null)
+                Text(
+                  'Humidity:$humidity%',
+                  style: TextStyle(fontSize:22),
+                ),
             ]
-
-
           ],
         ),
       ),
